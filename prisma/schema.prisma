@@ -1,0 +1,103 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id               Int         @id @default(autoincrement())
+  username         String?
+  email            String      @unique
+  password         String
+  rights           UserRight   @default(TEAM_MEMBER)
+  isVerifiedByEmail Boolean
+  status           UserStatus  @default(ACTIVE)  
+  teamId           Int?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  
+  // Quan hệ
+  team             Team?       @relation("TeamMembers", fields: [teamId], references: [id], onDelete: SetNull)
+  createdTeam      Team?       @relation("CreatedTeam")
+  setting          Setting?
+  magicLinks       MagicLink[]
+  
+}
+
+model Team {
+  id          Int      @id @default(autoincrement())
+  name        String
+  creatorId   Int      @unique
+  status      String
+  targetUrl   String
+  
+  // Quan hệ
+  creator     User     @relation("CreatedTeam", fields: [creatorId], references: [id])
+  members     User[]   @relation("TeamMembers")
+  magicLinks  MagicLink[]
+   createdAt   DateTime @default(now()) // Tự động gán thời gian tạo
+  updatedAt   DateTime @updatedAt      // Tự động cập nhật thời gian chỉnh sửa
+}
+
+model Setting {
+  id          Int      @id @default(autoincrement())
+  domain      String   @db.Text // Lưu dưới dạng JSON string
+  targetUrl   String
+  date_create DateTime @default(now())
+  date_update DateTime @updatedAt
+  userId      Int      @unique
+  
+  // Quan hệ
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+model MagicLink {
+  id          Int      @id @default(autoincrement())
+  hid         String
+  mask        String
+  targets     String
+  status      Int
+  creatorId   Int      // Liên kết với User (người tạo)
+  creator     User     @relation(fields: [creatorId], references: [id]) // Quan hệ với User
+  teamId      Int?
+  team        Team?    @relation(fields: [teamId], references: [id])
+  online_count Int
+  createdAt   DateTime @default(now()) // Tự động gán thời gian tạo
+  updatedAt   DateTime @updatedAt      // Tự động cập nhật thời gian chỉnh sửa
+  view        View?    // Quan hệ một-một với View
+}
+
+model View {
+  id          Int      @id @default(autoincrement())
+  linkId      Int      @unique // Liên kết với MagicLink (khóa ngoại, duy nhất)
+  magicLink   MagicLink @relation(fields: [linkId], references: [id]) // Quan hệ với MagicLink
+  country     Int
+  ipAddress   String?
+  userAgent   String?
+  device      String?
+  createdAt   DateTime @default(now()) // Tự động gán thời gian tạo
+  updatedAt   DateTime @updatedAt      // Tự động cập nhật thời gian chỉnh sửa
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+}
+
+
+enum UserRight {
+  ADMIN                 // Quyền quản trị hệ thống
+  TEAM_ADMIN            // Quyền quản lý team
+  TEAM_MEMBER           // Quyền thành viên team cơ bản
+}
