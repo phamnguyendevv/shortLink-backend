@@ -165,6 +165,22 @@ const authController = {
     } catch (error) {
       next(error)
     }
+  },
+  getMeController: async (req: Request, res: Response<RegisterResponse>, next: NextFunction): Promise<void> => {
+    try {
+      const userId = req.params.id
+      if (!userId) {
+        res.status(HTTP_STATUS.BAD_REQUEST).json({
+          message: 'Người dùng không tồn tại',
+          status: HTTP_STATUS.BAD_REQUEST
+        })
+        return
+      }
+      const result = await authService.getMe(Number(userId))
+      res.status(result.status || HTTP_STATUS.OK).json(result)
+    } catch (error) {
+      next(error)
+    }
   }
 }
 

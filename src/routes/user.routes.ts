@@ -35,4 +35,6 @@ router.patch('/update-password', isAuthenticatedUser, wrapAsync(AuthController.u
 
 router.post('/update-setting', isAuthenticatedUser, wrapAsync(AuthController.updateSettingController))
 
+router.get('/:id', wrapAsync(AuthController.getMeController))
+
 export default router

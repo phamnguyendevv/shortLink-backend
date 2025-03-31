@@ -46,7 +46,7 @@ model Team {
 model Setting {
   id        Int      @id @default(autoincrement())
   userId    Int      @unique
-  targetUrl String
+  targetUrl String?
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
    domains   Domain[] // ✅ Chuyển sang quan hệ 1-N
    createdAt   DateTime @default(now()) // Tự động gán thời gian tạo

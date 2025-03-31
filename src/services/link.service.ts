@@ -48,6 +48,7 @@ const LinkService = {
         hid: link.hid,
         creatorId: link.creatorId,
         teamId: user?.teamId,
+        shortLink: shortLink.path,
         targetUrl,
         createdAt: link.createdAt,
         updatedAt: link.updatedAt

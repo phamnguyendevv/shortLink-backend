@@ -5,18 +5,30 @@ const prisma = new PrismaClient()
 
 export class AuthRepository {
   async createUser(data: CreateUserData) {
-    const { email, username, password, rights, isVerifiedByEmail, teamId, code } = data
-    return await prisma.user.create({
-      data: {
-        email,
-        username,
-        password,
-        name: email, // Use username as the name or provide a default value
-        rights: rights as Rights, // Ensure rights is cast to UserRight
-        isVerifiedByEmail,
-        teamId: teamId ? teamId : null, // Set teamId to null if not provided
-        code: code || '' // Provide a default value for code if not provided
-      }
+    const { email, username, password, rights, isVerifiedByEmail, teamId, code, targetUrl } = data
+    console.log('targetUrl2', targetUrl)
+    return await prisma.$transaction(async (transactionPrisma) => {
+      const user = await prisma.user.create({
+        data: {
+          email,
+          username,
+          password,
+          name: email, // Use username as the name or provide a default value
+          rights: rights as Rights, // Ensure rights is cast to UserRight
+          isVerifiedByEmail,
+          teamId: teamId ? teamId : null, // Set teamId to null if not provided
+          code: code || '' // Provide a default value for code if not provided
+        }
+      })
+
+      // Create settings for the user
+      await transactionPrisma.setting.create({
+        data: {
+          targetUrl: targetUrl || '', // Provide a default value for targetUrl if not provided
+          user: { connect: { id: user.id } }
+        }
+      })
+      return user
     })
   }
 

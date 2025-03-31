@@ -18,25 +18,18 @@ const AuthService = {
 
       let teamId: number | null = null
 
+      let targetUrl = undefined
+
       const userad = await authRepository.findUserById(adminId)
 
       if (userad?.rights === 'TEAM_ADMIN') {
         rights = Rights.TEAM_MEMBER
-        const team = await teamRepository.findByCreatorId(adminId)
+        const team = await teamRepository.findTeamByCreatorId(adminId)
         teamId = team?.id || null
+        targetUrl = team?.targetUrl
       }
       if (userad?.rights === 'ADMIN') {
         rights = data.rights
-      }
-
-      // Check if email already exists
-      const existingUser = await authRepository.findUserByEmail(email)
-
-      if (existingUser) {
-        return {
-          message: 'Email đã tồn tại',
-          status: HTTP_STATUS.BAD_REQUEST
-        }
       }
 
       // Hash the password
@@ -50,7 +43,8 @@ const AuthService = {
         rights: rights || '',
         isVerifiedByEmail: false,
         teamId,
-        code
+        code,
+        targetUrl
       })
 
       const { password: userPassword, ...dataUser } = user
@@ -247,6 +241,7 @@ const AuthService = {
       }
     }
   },
+
   async updateSetting(data: UpdateSettingData, userId: number): Promise<UpdateSettingResponse> {
     try {
       const { domains } = data
@@ -268,7 +263,7 @@ const AuthService = {
         }
       }
       return {
-        data: updatedUser,
+        data: { ...updatedUser, targetUrl: updatedUser.targetUrl ?? undefined },
         message: 'Cập nhật thông tin thành công',
         status: HTTP_STATUS.OK
       }
@@ -276,6 +271,29 @@ const AuthService = {
       console.error('Lỗi khi cập nhật thông tin:', error)
       return {
         message: 'Cập nhật thông tin thất bại',
+        status: HTTP_STATUS.BAD_REQUEST
+      }
+    }
+  },
+  async getMe(userId: number): Promise<RegisterResponse> {
+    try {
+      const user = await authRepository.findUserById(userId)
+      if (!user) {
+        return {
+          message: 'Người dùng không tồn tại',
+          status: HTTP_STATUS.BAD_REQUEST
+        }
+      }
+      const { password, ...dataUser } = user
+      return {
+        message: 'Lấy thông tin người dùng thành công',
+        data: dataUser,
+        status: HTTP_STATUS.OK
+      }
+    } catch (error) {
+      console.error('Lỗi khi lấy thông tin người dùng:', error)
+      return {
+        message: 'Lấy thông tin người dùng thất bại',
         status: HTTP_STATUS.BAD_REQUEST
       }
     }

@@ -6,6 +6,7 @@ interface CreateUserData {
   isVerifiedByEmail: boolean
   teamId?: number | null
   code?: string
+  targetUrl?: string
 }
 
 interface CreateTeamData {

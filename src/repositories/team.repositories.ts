@@ -18,7 +18,50 @@ export class TeamRepository {
   }
   findByCreatorId = async (creatorId: number) => {
     return await prisma.team.findFirst({
-      where: { creatorId }
+      where: { creatorId },
+      include: {
+        members: {
+          select: {
+            id: true,
+            email: true,
+            username: true,
+            settings: {
+              select: {
+                id: true,
+                targetUrl: true,
+                domains: {
+                  select: {
+                    domain: true
+                  }
+                }
+              }
+            },
+            links: {
+              select: {
+                id: true,
+                hid: true,
+                mask: true,
+                targetUrl: true,
+                clicks: {
+                  select: {
+                    id: true,
+                    ipStatus: true,
+                    userAgent: true,
+                    isBot: true,
+                    country: true,
+                    city: true,
+                    region: true,
+                    isOnline: true,
+                    destination: true,
+                    botScore: true,
+                    createdAt: true
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
     })
   }
   findTeamByCreatorId = async (id: number) => {

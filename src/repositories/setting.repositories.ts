@@ -4,19 +4,18 @@ const prisma = new PrismaClient()
 
 export class SettingRepository {
   async updateSetting(userId: number, data: any) {
-    const { domains, targetUrl } = data
+    const { domains } = data
 
     // Check if the record exists
     const existingSetting = await prisma.setting.findUnique({
       where: { userId: userId }
     })
-
     if (!existingSetting) {
       // Create a new setting if it doesn't exist
       const newSetting = await prisma.setting.create({
         data: {
           userId,
-          targetUrl
+          targetUrl: ''
         }
       })
 
@@ -43,13 +42,7 @@ export class SettingRepository {
         }
       })
     } else {
-      // Update the existing setting
-      await prisma.setting.update({
-        where: { userId: userId },
-        data: {
-          targetUrl
-        }
-      })
+ 
 
       // Delete existing domains for the setting
       await prisma.domain.deleteMany({
