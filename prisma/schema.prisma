@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                Int        @id @default(autoincrement())
+  name              String
+  username          String     @unique
+  email             String     @unique
+  password          String
+  rights            UserRight  @default(TEAM_MEMBER)
+  isVerifiedByEmail Boolean    @default(false)
+  status            UserStatus @default(PENDING)
+  teamId            Int?
+  code              String?
+  createdAt         DateTime   @default(now())
+  updatedAt         DateTime   @updatedAt
+
+  settings          Setting?
+  team             Team?       @relation("TeamMembers", fields: [teamId], references: [id], onDelete: SetNull)
+  createdTeam      Team?       @relation("CreatedTeam")  
+  links             Link[]
+}
+
+
+model Team {
+  id          Int      @id @default(autoincrement())
+  name        String
+  creatorId   Int      @unique
+  status      String
+  targetUrl   String
+  
+  // Quan hệ
+  creator     User     @relation("CreatedTeam", fields: [creatorId], references: [id])
+  members     User[]   @relation("TeamMembers")
+   createdAt   DateTime @default(now()) // Tự động gán thời gian tạo
+  updatedAt   DateTime @updatedAt      // Tự động cập nhật thời gian chỉnh sửa
+}
+
+
+model Setting {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  targetUrl String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+   domains   Domain[] // ✅ Chuyển sang quan hệ 1-N
+   createdAt   DateTime @default(now()) // Tự động gán thời gian tạo
+  updatedAt   DateTime @updatedAt      // Tự động cập nhật thời gian chỉnh sửa
+}
+
+model Domain {
+  id        Int    @id @default(autoincrement())
+  domain    String
+  settingId Int
+  setting   Setting @relation(fields: [settingId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now()) // Tự động gán thời gian tạo
+  updatedAt   DateTime @updatedAt      // Tự động cập nhật thời gian chỉnh sửa
+}
+
+model Link {
+  id          Int      @id @default(autoincrement())
+  hid         String   @unique  
+  path        String
+  mask        String
+  targetUrl   String
+  creatorId   Int
+
+  user        User     @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  clicks      Click[]
+
+  createdAt   DateTime @default(now()) // Tự động gán thời gian tạo
+  updatedAt   DateTime @updatedAt      // Tự động cập nhật thời gian chỉnh sửa
+}
+
+model Click {
+  id          Int      @id @default(autoincrement())
+  linkId      Int
+  link        Link     @relation(fields: [linkId], references: [id], onDelete: Cascade)
+  ipStatus    Json
+  userAgent   String
+  isBot       Boolean
+  country     String
+  city        String
+  region      String
+  isOnline    Boolean
+  destination String
+  botScore    Int?
+  view_count  Int      @default(0)
+  createdAt   DateTime @default(now()) // Tự động gán thời gian tạo
+  updatedAt   DateTime @updatedAt      // Tự động cập nhật thời gian chỉnh sửa
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  PENDING
+}
+
+enum UserRight {
+  ADMIN
+  TEAM_ADMIN
+  TEAM_MEMBER
+}
