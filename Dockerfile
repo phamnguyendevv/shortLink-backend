@@ -1,26 +1,19 @@
-# Sử dụng Node.js v20 làm base image
-FROM node:20
-
-# Thiết lập thư mục làm việc trong container
+FROM node:20-alpine
 WORKDIR /app
 
-# Sao chép package.json và package-lock.json trước để tận dụng Docker cache
-COPY package*.json ./
+# 1. Copy package files trước
+COPY package.json yarn.lock ./
 
-# Cài đặt dependencies nhưng không cài devDependencies (nếu không cần)
-RUN yarn install
+# 2. Cài đặt dependencies
+RUN yarn install --frozen-lockfile --production
 
-# Sao chép toàn bộ mã nguồn vào container
+# 3. Copy TOÀN BỘ source code (bao gồm cả thư mục prisma)
 COPY . .
 
-# Chạy Prisma generate sau khi có toàn bộ source code
-RUN yarn prisma generate 
+# 4. Chạy prisma generate sau khi đã có đủ file
+RUN yarn prisma generate
 
-# Biên dịch TypeScript (nếu dự án của bạn cần)
+# 5. Build ứng dụng (nếu cần)
 RUN yarn build
 
-# Mở cổng 8080
-EXPOSE 8080
-
-# Khởi chạy ứng dụng
-CMD ["node", "dist/index.js"]
+CMD ["yarn", "start"]

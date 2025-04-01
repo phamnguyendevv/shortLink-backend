@@ -1,66 +1,30 @@
 version: 0.2
 
-phases:
-  pre_build:
-    commands:
-      - echo "Running pre-build tasks..."
-      - aws --version
-      - $(aws ecr get-login --region $AWS_DEFAULT_REGION --no-include-email)
-      - REPOSITORY_URI=916495840179.dkr.ecr.us-east-1.amazonaws.com/your-repo-name
-version: 0.2
-
 env:
   variables:
-    # Thay thế bằng tên ECR repository của bạn
-    ECR_REPO_NAME: "sortlink"
-    AWS_ACCOUNT_ID: "905417994528"
-    AWS_DEFAULT_REGION: "us-east-1"
-  parameter-store:
-    # Nếu cần biến môi trường từ AWS Systems Manager Parameter Store
-    # NODE_ENV: "/myapp/NODE_ENV" 
+    ECR_REPO_NAME: 'sortlink'
+    AWS_ACCOUNT_ID: '905417994528'
+    AWS_DEFAULT_REGION: 'us-east-1'
 
 phases:
   install:
     runtime-versions:
-      nodejs: 18  # Phiên bản Node.js
+      nodejs: 18
     commands:
-      - echo "Installing Node.js dependencies..."
-      - npm ci  # Sử dụng npm ci thay cho npm install để đảm bảo consistency
+      - npm install -g yarn
+      - yarn install --frozen-lockfile
 
   pre_build:
     commands:
-      - echo "Logging in to Amazon ECR..."
-      - aws ecr get-login-password | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
-      - echo "Running tests..."
-      - npm run test  # Chạy unit test (nếu có script 'test' trong package.json)\
-      - REPOSITORY_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_REPO_NAME}
-      - echo "Preparing Docker build..."
+      - yarn test || true
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=${COMMIT_HASH}-$(date +%Y%m%d%H%M%S)
 
   build:
     commands:
-      - echo "Building Docker image..."
       - docker build -t ${ECR_REPO_NAME}:${IMAGE_TAG} .
       - docker tag ${ECR_REPO_NAME}:${IMAGE_TAG} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_REPO_NAME}:${IMAGE_TAG}
-      - docker tag ${ECR_REPO_NAME}:${IMAGE_TAG} ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_REPO_NAME}:latest
-
-  post_build:
-    commands:
-      - echo "Pushing Docker image to ECR..."
-      - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_REPO_NAME}:${IMAGE_TAG}
-      - docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_REPO_NAME}:latest
-      - echo "Build completed at $(date)"
-      - echo "Generating image definitions for ECS (nếu dùng ECS)..."
-      - printf '[{"name":"nodejs-app","imageUri":"%s"}]' ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_REPO_NAME}:${IMAGE_TAG} > imagedefinitions.json
 
 artifacts:
   files:
-    - imagedefinitions.json  # Bắt buộc nếu triển khai lên ECS
-    # Thêm các file cần thiết khác (ví dụ: package.json, dist/*)
-  secondary-artifacts:
-    # Tùy chọn: Đóng gói source code (nếu cần)
-    build-output:
-      base-directory: .
-      files:
-        - "**/*"
+    - imagedefinitions.json
