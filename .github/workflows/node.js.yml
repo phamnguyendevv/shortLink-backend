@@ -19,6 +19,9 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'yarn'
+    - name: Install Yarn
+      run: npm install --global yarn  # Install Yarn globally
     - run: yarn install --frozen-lockfile
     - run: yarn prisma generate  # Ensure Prisma client is generated
     - run: yarn build --if-present
+    - run: yarn test
