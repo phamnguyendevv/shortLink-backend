@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { Prisma, PrismaClient } from '@prisma/client'
 import { Rights } from '~/constants/rights'
 
 const prisma = new PrismaClient()
@@ -84,7 +84,7 @@ export class AuthRepository {
 
   async createUserWithTeam(userData: CreateUserData, teamData: CreateTeamData) {
     try {
-      return await prisma.$transaction(async (transactionPrisma) => {
+      return await prisma.$transaction(async (transactionPrisma: Prisma.TransactionClient) => {
         // Create the user first
         const newUser = await transactionPrisma.user.create({
           data: {

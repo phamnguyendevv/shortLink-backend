@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { Prisma, PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -170,12 +170,12 @@ export class TeamRepository {
     })
   }
 
-  updateTeam = async (id: number, data: any) => {
+  updateTeam = async (id: number, data: Prisma.TeamUpdateInput) => {
     await prisma.team.update({
       where: { id },
       data
     })
-    return await prisma.team.findUnique({
+    return prisma.team.findUnique({
       where: { id },
       include: {
         members: {

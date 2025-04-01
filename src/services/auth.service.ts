@@ -3,7 +3,6 @@ import { Rights } from '../constants/rights'
 import { comparePassword, hashPassword } from '../utils/password' // Assuming hashPassword is a utility function
 import { authRepository } from '../repositories/user.repositories'
 import { teamRepository } from '../repositories/team.repositories'
-import { UserStatus } from '@prisma/client'
 import { decoToken, generateToken, refreshTokens } from '../utils/jwt'
 import { settingRepository } from '../repositories/setting.repositories'
 
@@ -124,14 +123,14 @@ const AuthService = {
         password: hashedPassword,
         rights: Rights.TEAM_ADMIN, // Creator of the team will have TEAM_ADMIN rights
         isVerifiedByEmail: false,
-        status: UserStatus.ACTIVE,
+        status: 'ACTIVE',
         code: code
       }
 
       // Prepare team data
       const teamData = {
         name: teamName || username,
-        status: UserStatus.ACTIVE,
+        status: 'ACTIVE',
         targetUrl
       }
 
