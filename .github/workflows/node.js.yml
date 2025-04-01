@@ -24,6 +24,11 @@ jobs:
         cache: 'yarn'
     - name: Install Yarn
       run: npm install -g yarn
-    - run: yarn install --frozen-lockfile
-    - run: yarn build --if-present
-    - run: yarn test
+    - name: Verify Yarn installation
+      run: yarn --version
+    - name: Install dependencies
+      run: yarn install --frozen-lockfile
+    - name: Build
+      run: yarn build --if-present
+    - name: Test
+      run: yarn test
