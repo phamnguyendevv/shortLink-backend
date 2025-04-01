@@ -3,27 +3,26 @@ name: Node.js CI
 on:
   push:
     branches: [ "master" ]
+
 jobs:
   build:
-    runs-on: self-hosted
-
-    strategy:
-      matrix:
-        node-version: [18.x, 20.x, 22.x]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-
+    runs-on: self-hosted  # Hoặc ubuntu-latest nếu dùng GitHub-hosted runner
+    
     steps:
     - uses: actions/checkout@v4
-    - name: Use Node.js ${{ matrix.node-version }}
+    
+    - name: Use Node.js 22.x
       uses: actions/setup-node@v4
       with:
-        node-version: ${{ matrix.node-version }}
+        node-version: '22.x'  # Chỉ định rõ version 22.x
         cache: 'yarn'
+    
     - name: Install Yarn
       run: |
-        npm install --global yarn  # Install Yarn globally
-        echo "$(npm bin -g)" >> $GITHUB_PATH  # Ensure Yarn is in the PATH
+        npm install --global yarn
+        echo "::add-path::$(npm bin -g)"
+    
     - run: yarn install --frozen-lockfile
-    - run: yarn prisma generate  # Ensure Prisma client is generated
+    - run: yarn prisma generate
     - run: yarn build --if-present
     - run: yarn test
