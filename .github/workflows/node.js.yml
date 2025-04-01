@@ -11,12 +11,17 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Setup Node.js 22 with Yarn
+    - name: Setup Node.js 22.x
       uses: actions/setup-node@v4
       with:
         node-version: '22.x'
         cache: 'yarn'
-        yarn-default: true
+    
+    - name: Enable Corepack (for Yarn)
+      run: |
+        corepack enable
+        corepack prepare yarn@stable --activate
+        echo "::add-path::$(yarn global bin)"
     
     - run: yarn install --frozen-lockfile
     - run: yarn prisma generate
