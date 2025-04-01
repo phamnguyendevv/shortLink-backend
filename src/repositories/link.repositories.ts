@@ -22,24 +22,6 @@ export class LinkRepository {
     }
   }
 
-  async findLinkById(id: number) {
-    return await prisma.link.findUnique({
-      where: { id }
-    })
-  }
-
-  async updateLink(id: number, data: any) {
-    return await prisma.link.update({
-      where: { id },
-      data
-    })
-  }
-
-  async deleteLink(id: number) {
-    return await prisma.link.delete({
-      where: { id }
-    })
-  }
   async findLinkByPath(path: string) {
     return await prisma.link.findFirst({
       where: { path: path } // Replace '0' and 'path' with appropriate values
