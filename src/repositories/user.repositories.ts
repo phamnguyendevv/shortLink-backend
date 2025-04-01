@@ -6,8 +6,7 @@ const prisma = new PrismaClient()
 export class AuthRepository {
   async createUser(data: CreateUserData) {
     const { email, username, password, rights, isVerifiedByEmail, teamId, code, targetUrl } = data
-    console.log('targetUrl2', targetUrl)
-    return await prisma.$transaction(async (transactionPrisma) => {
+    return await prisma.$transaction(async (transactionPrisma: Prisma.TransactionClient) => {
       const user = await prisma.user.create({
         data: {
           email,

@@ -170,12 +170,12 @@ export class TeamRepository {
     })
   }
 
-  updateTeam = async (id: number, data: Prisma.TeamUpdateInput) => {
+  updateTeam = async (id: number, data: any) => {
     await prisma.team.update({
       where: { id },
       data
     })
-    return prisma.team.findUnique({
+    return await prisma.team.findUnique({
       where: { id },
       include: {
         members: {
@@ -223,7 +223,7 @@ export class TeamRepository {
     })
   }
   removeMember = async (teamId: number, memberId: number) => {
-    return await prisma.$transaction(async (transactionPrisma) => {
+    return await prisma.$transaction(async (transactionPrisma: Prisma.TransactionClient) => {
       // Step 1: Disconnect the member from the team
       await transactionPrisma.team.update({
         where: { id: teamId },
