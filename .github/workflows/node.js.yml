@@ -9,7 +9,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [22.x]
+        node-version: [18.x, 20.x, 22.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -20,7 +20,9 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'yarn'
     - name: Install Yarn
-      run: npm install --global yarn  # Install Yarn globally
+      run: |
+        npm install --global yarn  # Install Yarn globally
+        echo "$(npm bin -g)" >> $GITHUB_PATH  # Ensure Yarn is in the PATH
     - run: yarn install --frozen-lockfile
     - run: yarn prisma generate  # Ensure Prisma client is generated
     - run: yarn build --if-present
