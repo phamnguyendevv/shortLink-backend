@@ -6,21 +6,17 @@ on:
 
 jobs:
   build:
-    runs-on: self-hosted  # Hoặc ubuntu-latest nếu dùng GitHub-hosted runner
+    runs-on: self-hosted
     
     steps:
     - uses: actions/checkout@v4
     
-    - name: Use Node.js 22.x
+    - name: Setup Node.js 22 with Yarn
       uses: actions/setup-node@v4
       with:
-        node-version: '22.x'  # Chỉ định rõ version 22.x
+        node-version: '22.x'
         cache: 'yarn'
-    
-    - name: Install Yarn
-      run: |
-        npm install --global yarn
-        echo "::add-path::$(npm bin -g)"
+        yarn-default: true
     
     - run: yarn install --frozen-lockfile
     - run: yarn prisma generate
