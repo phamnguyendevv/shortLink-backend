@@ -8,16 +8,16 @@ WORKDIR /app
 COPY package*.json ./
 
 # Cài đặt dependencies nhưng không cài devDependencies (nếu không cần)
-RUN npm install --omit=dev
+RUN yarn install
 
 # Sao chép toàn bộ mã nguồn vào container
 COPY . .
 
 # Chạy Prisma generate sau khi có toàn bộ source code
-RUN npx prisma generate
+RUN yarn prisma generate 
 
 # Biên dịch TypeScript (nếu dự án của bạn cần)
-RUN npm run build
+RUN yarn build
 
 # Mở cổng 8080
 EXPOSE 8080
