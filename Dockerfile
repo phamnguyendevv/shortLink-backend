@@ -1,25 +1,25 @@
-# Sử dụng một image cơ sở có chứa Node.js
+# Sử dụng Node.js v20 làm base image
 FROM node:20
 
-# Thiết lập thư mục làm việc 
+# Thiết lập thư mục làm việc trong container
 WORKDIR /app
 
-# Sao chép file package.json và package-lock.json vào thư mục làm việc
+# Sao chép package.json và package-lock.json trước để tận dụng Docker cache
 COPY package*.json ./
 
-# Cài đặt các dependency
-RUN npm install
+# Cài đặt dependencies nhưng không cài devDependencies (nếu không cần)
+RUN npm install --omit=dev
 
-# Sao chép các file còn lại của dự án vào thư mục làm việc
+# Sao chép toàn bộ mã nguồn vào container
 COPY . .
 
-# Cài đặt TypeScript nếu bạn cần biên dịch
-RUN npm install -g typescript
+# Chạy Prisma generate sau khi có toàn bộ source code
+RUN npx prisma generate
 
-# Biên dịch mã TypeScript
-RUN tsc
+# Biên dịch TypeScript (nếu dự án của bạn cần)
+RUN npm run build
 
-# Mở cổng 8080 để ứng dụng Node.js lắng nghe
+# Mở cổng 8080
 EXPOSE 8080
 
 # Khởi chạy ứng dụng
