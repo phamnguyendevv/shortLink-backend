@@ -12,9 +12,9 @@ version: 0.2
 env:
   variables:
     # Thay thế bằng tên ECR repository của bạn
-    ECR_REPO_NAME: "sortLink"
+    ECR_REPO_NAME: "sortlink"
     AWS_ACCOUNT_ID: "905417994528"
-    AWS_DEFAULT_REGION: "ap-southeast-1"
+    AWS_DEFAULT_REGION: "us-east-1"
   parameter-store:
     # Nếu cần biến môi trường từ AWS Systems Manager Parameter Store
     # NODE_ENV: "/myapp/NODE_ENV" 
@@ -32,7 +32,8 @@ phases:
       - echo "Logging in to Amazon ECR..."
       - aws ecr get-login-password | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
       - echo "Running tests..."
-      - npm run test  # Chạy unit test (nếu có script 'test' trong package.json)
+      - npm run test  # Chạy unit test (nếu có script 'test' trong package.json)\
+      - REPOSITORY_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com/${ECR_REPO_NAME}
       - echo "Preparing Docker build..."
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=${COMMIT_HASH}-$(date +%Y%m%d%H%M%S)
