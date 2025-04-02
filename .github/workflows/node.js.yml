@@ -28,9 +28,6 @@ jobs:
       run: |
         yarn install --immutable || (echo "⚠️ yarn.lock is outdated, syncing..." && yarn install && git add yarn.lock && git commit -m "Update yarn.lock [CI/CD]" || true)
 
-    - name: Verify dependencies (For Workspaces)
-      if: ${{ hashFiles('package.json') != '' }}
-      run: yarn workspaces focus --all || true
 
     - name: Build application
       run: yarn build 
