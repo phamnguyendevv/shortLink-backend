@@ -1,19 +1,23 @@
+# Base image
 FROM node:20-alpine
+
+# Set working directory
 WORKDIR /app
 
-# 1. Copy package files trước
+# Copy package.json và yarn.lock trước để cache dependencies
 COPY package.json yarn.lock ./
 
-# 2. Cài đặt dependencies
-RUN yarn install --frozen-lockfile --production
+# Cài đặt cả devDependencies để có @types/*
+RUN yarn install --frozen-lockfile
 
-# 3. Copy TOÀN BỘ source code (bao gồm cả thư mục prisma)
+# Copy toàn bộ source code
 COPY . .
 
-# 4. Chạy prisma generate sau khi đã có đủ file
+# Generate Prisma client (nếu có Prisma)
 RUN yarn prisma generate
 
-# 5. Build ứng dụng (nếu cần)
+# Build TypeScript project
 RUN yarn build
 
+# Chạy ứng dụng
 CMD ["yarn", "start"]
