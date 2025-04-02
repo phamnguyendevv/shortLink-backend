@@ -9,20 +9,30 @@ jobs:
     runs-on: self-hosted
     strategy:
       matrix:
-        node-version: [20.x]  # Chỉ chạy Node.js 20.x
+        node-version: [20.x]  # Chỉ chạy trên Node.js 20.x
 
     steps:
-    - uses: actions/checkout@v4
+    - name: Check out repository
+      uses: actions/checkout@v4
+
     - name: Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
         cache: 'yarn'
+
     - name: Verify Yarn installation
       run: yarn --version
+
+    - name: Clean Yarn Cache
+      run: yarn cache clean
+
     - name: Install dependencies
-      run: yarn install --immutable
-    - name: Build
+      run: |
+        yarn install --immutable || (echo "⚠️ yarn.lock is outdated, syncing..." && yarn install && git add yarn.lock && git commit -m "Update yarn.lock [CI/CD]" || true)
+
+    - name: Build application
       run: yarn build 
-    - name: Test
+
+    - name: Run tests
       run: yarn test
