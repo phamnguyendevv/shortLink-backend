@@ -4,8 +4,8 @@ import teamRouter from './team.routes'
 import linkRouter from './link.routes'
 const router = express.Router()
 
-router.get('/health', (req, res) => {
-  res.send('Shope web is healthy!')
+router.get('/', (req, res) => {
+  res.send('web chay ngon keng luon!')
 })
 
 router.use('/', authRouter)

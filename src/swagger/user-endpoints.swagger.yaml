@@ -3,6 +3,33 @@ info:
   title: 'Auth API'
   version: '1.0.0'
 paths:
+  /:
+    get:
+      summary: 'check api is alive'
+      description: 'Check if the API is alive'
+      tags: ['Health Check']
+      responses:
+        '200':
+          description: 'API is alive'
+          content:
+            application/json:
+              schema:
+                type: 'object'
+                properties:
+                  message:
+                    type: 'string'
+                    example: 'API is alive'
+        '500':
+          description: 'Internal server error'
+          content:
+            application/json:
+              schema:
+                type: 'object'
+                properties:
+                  message:
+                    type: 'string'
+                    example: 'Internal server error'
+
   /auth/register:
     post:
       summary: 'Tạo tài khoản người dùng ( nếu role là user thì phải truyền teamId ) '
@@ -304,6 +331,9 @@ paths:
           description: 'Lỗi server nội bộ'
 
 tags:
+  - name: Health Check
+    description: Health check endpoints
+
   - name: Users
     description: User management endpoints
 
