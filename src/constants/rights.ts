@@ -3,8 +3,8 @@ export enum Rights {
   TEAM_ADMIN = 'TEAM_ADMIN',
   TEAM_MEMBER = 'TEAM_MEMBER'
 }
+
 export enum UserStatus {
   ACTIVE = 'ACTIVE',
-  INACTIVE = 'INACTIVE',
-  PENDING = 'PENDING'
+  INACTIVE = 'INACTIVE'
 }

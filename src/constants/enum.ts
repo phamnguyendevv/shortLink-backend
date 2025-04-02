@@ -1,13 +1,10 @@
+export enum UserRole {
+  ADMIN = 'ADMIN',
+  LEADER = 'LEADER',
+  USER = 'USER'
+}
+
 export enum UserStatus {
-  ACTIVE,
-  INACTIVE,
-  PENDING
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE'
 }
-
-export enum UserRight {
-  ADMIN, // Quyền quản trị hệ thống
-  TEAM_ADMIN, // Quyền quản lý team
-  TEAM_MEMBER // Quyền thành viên team cơ bản
-}
-
-

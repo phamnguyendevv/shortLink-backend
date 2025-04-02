@@ -8,7 +8,7 @@ router.get('/health', (req, res) => {
   res.send('Shope web is healthy!')
 })
 
-router.use('/auth', authRouter)
+router.use('/', authRouter)
 router.use('/team', teamRouter)
 router.use('', linkRouter)
 export default router

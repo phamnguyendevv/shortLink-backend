@@ -12,28 +12,7 @@ const authController = {
     next: NextFunction
   ): Promise<void> => {
     try {
-      const teamId = Number(req.user?.id ?? 0)
-      if (teamId === 0) {
-        res.status(HTTP_STATUS.BAD_REQUEST).json({
-          message: 'Người dùng không tồn tại',
-          status: HTTP_STATUS.BAD_REQUEST,
-          data: {}
-        })
-        return
-      }
-      const result = await authService.register(req.body, teamId)
-      res.status(result.status || HTTP_STATUS.OK).json(result)
-    } catch (error) {
-      next(error)
-    }
-  },
-  registerAdminController: async (
-    req: Request<{}, {}, CreateUserData>,
-    res: Response<RegisterResponse>,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const result = await authService.registerAdmin(req.body)
+      const result = await authService.register(req.body)
       res.status(result.status || HTTP_STATUS.OK).json(result)
     } catch (error) {
       next(error)
@@ -78,7 +57,7 @@ const authController = {
         })
       } catch (tokenError) {
         console.error('Lỗi khi tạo token:', tokenError)
-        res.status(HTTP_STATUS.INTERNAL_SERVER).json({
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
           message: 'Lỗi khi tạo token'
         })
       }
@@ -93,18 +72,7 @@ const authController = {
       })
     }
   },
-  registerWithTeamController: async (
-    req: Request<{}, {}, RegisterWithTeamData>,
-    res: Response<RegisterWithTeamResponse>,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const result = await authService.registerWithTeam(req.body)
-      res.status(result.status || HTTP_STATUS.OK).json(result)
-    } catch (error) {
-      next(error)
-    }
-  },
+
   refreshTokenController: async (
     req: Request<{}, {}, RefreshTokenData>,
     res: Response<RefreshTokenResponse>,
@@ -124,9 +92,10 @@ const authController = {
       next(error)
     }
   },
-  updatePasswordController: async (
-    req: Request<{}, {}, UpdatePasswordData>,
-    res: Response<UpdatePasswordResponse>,
+
+  updateController: async (
+    req: Request<{}, {}, UpdateUserData>,
+    res: Response<RegisterResponse>,
     next: NextFunction
   ): Promise<void> => {
     try {
@@ -138,34 +107,13 @@ const authController = {
         })
         return
       }
-
-      const result = await authService.updatePassword(req.body, userId)
+      const result = await authService.updateUser(req.body, userId)
       res.status(result.status || HTTP_STATUS.OK).json(result)
     } catch (error) {
       next(error)
     }
   },
-  updateSettingController: async (
-    req: Request<{}, {}, UpdateSettingData>,
-    res: Response<UpdateSettingResponse>,
-    next: NextFunction
-  ): Promise<void> => {
-    try {
-      const userId = req.user?.id
-      if (!userId) {
-        res.status(HTTP_STATUS.BAD_REQUEST).json({
-          message: 'Người dùng không tồn tại',
-          status: HTTP_STATUS.BAD_REQUEST
-        })
-        return
-      }
 
-      const result = await authService.updateSetting(req.body, userId)
-      res.status(result.status || HTTP_STATUS.OK).json(result)
-    } catch (error) {
-      next(error)
-    }
-  },
   getMeController: async (req: Request, res: Response<RegisterResponse>, next: NextFunction): Promise<void> => {
     try {
       const userId = req.params.id

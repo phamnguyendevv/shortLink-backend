@@ -9,7 +9,7 @@ const router = express.Router()
 router.get('', isAuthenticatedUser, wrapAsync(TeamController.getTeam))
 
 router.patch(
-  '',
+  '/update',
   isAuthenticatedUser,
   authorizeRoles(Rights.TEAM_ADMIN, Rights.ADMIN),
   wrapAsync(TeamController.updateTeam)

@@ -34,6 +34,7 @@ const TeamController = {
       next(error)
     }
   },
+
   getListTeam: async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const user = req.user

@@ -6,7 +6,8 @@ import morgan from 'morgan'
 import { errorHandler } from './middlewares/error.middlewares'
 import rootRouter from './routes/index'
 import { config } from './config/config'
-const PORT = config.server.port
+import { setupSwagger } from './swagger'
+const PORT = Number(config.server.port)
 
 const app = express()
 
@@ -18,7 +19,7 @@ app.use(cors())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-// Routes
+setupSwagger(app, PORT)
 app.use(rootRouter)
 
 // Error handling

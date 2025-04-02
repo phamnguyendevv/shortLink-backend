@@ -1,11 +1,11 @@
 import { Prisma, PrismaClient } from '@prisma/client'
-import { Rights } from '~/constants/rights'
+import { UserRole } from '../constants/enum'
 
 const prisma = new PrismaClient()
 
 export class AuthRepository {
   async createUser(data: CreateUserData) {
-    const { email, username, password, rights, isVerifiedByEmail, teamId, code, targetUrl } = data
+    const { email, username, password, roles, isVerifiedByEmail, teamId, code, targetUrl } = data
     return await prisma.$transaction(async (transactionPrisma: Prisma.TransactionClient) => {
       const user = await prisma.user.create({
         data: {
@@ -13,7 +13,7 @@ export class AuthRepository {
           username,
           password,
           name: email, // Use username as the name or provide a default value
-          rights: rights as Rights, // Ensure rights is cast to UserRight
+          roles: roles as UserRole, // Ensure rights is cast to UserRight
           isVerifiedByEmail,
           teamId: teamId ? teamId : null, // Set teamId to null if not provided
           code: code || '' // Provide a default value for code if not provided
@@ -31,7 +31,7 @@ export class AuthRepository {
     })
   }
 
-  async updateUser(email: string, data: { password: string }) {
+  async updateUser(email: string, data: any) {
     return await prisma.user.update({
       where: { email },
       data
@@ -89,7 +89,7 @@ export class AuthRepository {
           data: {
             ...userData,
             name: userData.username, // Use username as the name
-            rights: userData.rights as Rights, // Ensure rights is cast to UserRight
+            roles: userData.roles as UserRole, // Ensure rights is cast to UserRight
             teamId: userData.teamId ?? null // Ensure teamId is null if not provided
           }
         })

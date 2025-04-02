@@ -5,15 +5,19 @@ const TeamService = {
   getTeam: async (userId: number): Promise<any> => {
     console.log('userId', userId)
     try {
-      // Fetch team information from the database
-      const team = await teamRepository.findTeamByCreatorId(userId)
+      // Tìm team theo creatorId
+      let team = await teamRepository.findTeamByCreatorId(userId)
+
+      // Nếu không tìm thấy team, tiếp tục tìm theo memberId
       if (!team) {
-        throw new Error('Không tìm thấy team')
+        team = await teamRepository.findTeamByMemberId(userId)
       }
+
+      // Trả về kết quả
       return {
         data: team,
-        message: 'Lấy thông tin team thành công',
-        status: 200
+        message: team ? 'Lấy thông tin team thành công' : 'Không tìm thấy team',
+        status: team ? 200 : 404
       }
     } catch (error) {
       console.error('Lỗi khi lấy thông tin team', error)

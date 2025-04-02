@@ -1,12 +1,15 @@
+
+
 interface CreateUserData {
   email: string
   username: string
   password: string
-  rights: string
+  roles?: UserRole // Đổi từ string sang UserRole
   isVerifiedByEmail: boolean
   teamId?: number | null
   code?: string
   targetUrl?: string
+  status?: UserStatus
 }
 
 interface CreateTeamData {
@@ -27,7 +30,7 @@ interface User {
   id: number
   email: string
   username: string
-  rights: string
+  roles: UserRole // Đổi từ string sang UserRole
   isVerifiedByEmail: boolean
   teamId?: number | null
   password?: string
@@ -44,7 +47,7 @@ interface Team {
 
 interface RegisterResponse {
   message: string
-  data?: Partial<User>
+  data?: any
   status: number
 }
 
@@ -85,7 +88,7 @@ interface RefreshTokenResponse {
 
 interface UserPayload {
   id: string
-  rights: string
+  roles: UserRole // Đổi từ string sang UserRole
   // Add other user properties you expect in the token
 }
 
@@ -104,6 +107,14 @@ interface UpdatePasswordData {
   oldPassword: string
   newPassword: string
 }
+
+interface UpdateUserData {
+  oldPassword?: string
+  newPassword?: string
+  domains?: string[]
+  status?: string
+}
+
 interface UpdatePasswordResponse {
   message: string
   status: number
@@ -123,7 +134,7 @@ interface Setting {
 }
 
 interface UpdateSettingResponse {
-  data?: Setting
+  data?: any
   message: string
   status: number
 }

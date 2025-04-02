@@ -16,9 +16,15 @@ export class TeamRepository {
       }
     })
   }
-  findByCreatorId = async (creatorId: number) => {
+  findTeamByMemberId = async (id: number) => {
     return await prisma.team.findFirst({
-      where: { creatorId },
+      where: {
+        members: {
+          some: {
+            id
+          }
+        }
+      },
       include: {
         members: {
           select: {
@@ -42,6 +48,7 @@ export class TeamRepository {
                 hid: true,
                 mask: true,
                 targetUrl: true,
+
                 clicks: {
                   select: {
                     id: true,
@@ -64,6 +71,7 @@ export class TeamRepository {
       }
     })
   }
+
   findTeamByCreatorId = async (id: number) => {
     return await prisma.team.findUnique({
       where: { creatorId: id }, // Use the team's ID to find the team
@@ -113,16 +121,7 @@ export class TeamRepository {
       }
     })
   }
-  findTeamByName = async (name: string) => {
-    return await prisma.team.findFirst({
-      where: { name }
-    })
-  }
-  findTeamByTargetUrl = async (targetUrl: string) => {
-    return await prisma.team.findFirst({
-      where: { targetUrl }
-    })
-  }
+
   findAllTeam = async () => {
     return await prisma.team.findMany({
       include: {

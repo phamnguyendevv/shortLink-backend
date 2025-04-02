@@ -69,7 +69,7 @@ export const isAuthenticatedUser = wrapAsync(async (req: Request, res: Response,
 
     // For other unexpected errors
     console.error('Authentication error:', error)
-    res.status(HTTP_STATUS.INTERNAL_SERVER).json({
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       message: 'Lỗi xác thực'
     })
   }
@@ -92,8 +92,8 @@ export const authorizeRoles = (...allowedRoles: string[]) => {
       return
     }
 
-    const userRights = Array.isArray(user.rights) ? user.rights : [user.rights]
-    const hasPermission = userRights.some((right: string) => allowedRoles.includes(right))
+    const userRoles = Array.isArray(user.roles) ? user.roles : [user.roles]
+    const hasPermission = userRoles.some((roles: string) => allowedRoles.includes(roles))
 
     if (!hasPermission) {
       res.status(HTTP_STATUS.FORBIDDEN).json({

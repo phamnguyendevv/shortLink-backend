@@ -1,0 +1,381 @@
+openapi: '3.0.0'
+info:
+  title: 'Auth API Definitions'
+  version: '1.0.0'
+
+components:
+  schemas:
+    CreateUserData:
+      type: object
+      required:
+        - email
+        - username
+        - password
+        - roles
+      properties:
+        email:
+          type: string
+          format: email
+          example: ADAD@example.com
+        username:
+          type: string
+          example: ad
+        password:
+          type: string
+          format: password
+          example: 123456
+        roles:
+          type: string
+          items:
+            type: string
+            enum:
+              - USER
+              - ADMIN
+              - LEADER
+          example: ADMIN
+        teamId:
+          type: integer
+          example: 1
+          nullable: true
+
+    CreateAdminData:
+      type: object
+      required:
+        - email
+        - username
+        - password
+        - rights
+      properties:
+        email:
+          type: string
+          format: email
+          example: admin@example.com
+        username:
+          type: string
+          example: admin_user
+        password:
+          type: string
+          format: password
+          example: AdminP@ssword
+        rights:
+          type: string
+          enum:
+            - ADMIN
+            - TEAM_ADMIN
+            - TEAM_MEMBER
+          example: ADMIN
+        teamId:
+          type: integer
+          example: 1
+          nullable: true
+
+    CreateUserWithTeamData:
+      type: object
+      required:
+        - email
+        - username
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: teamuser@example.com
+        username:
+          type: string
+          example: team_user
+        password:
+          type: string
+          format: password
+          example: TeamP@ssword
+        targetUrl:
+          type: string
+          example: https://baomoi.com
+          nullable: true
+
+    RegisterResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: User registered successfully
+        data:
+          $ref: '#/components/schemas/User'
+        status:
+          type: integer
+          example: 201
+
+    LoginData:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: user@example.com
+        password:
+          type: string
+          format: password
+          example: Str0ngP@ssword
+
+    LoginResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Đăng nhập thành công
+        data:
+          type: object
+          properties:
+            user:
+              $ref: '#/components/schemas/User'
+            team:
+              type: object
+              nullable: true
+              example: null
+        token:
+          $ref: '#/components/schemas/Token'
+
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: John Doe
+        username:
+          type: string
+          example: john_doe
+        email:
+          type: string
+          example: user@example.com
+        rights:
+          type: string
+          example: USER
+        isVerifiedByEmail:
+          type: boolean
+          example: false
+        status:
+          type: string
+          example: ACTIVE
+        teamId:
+          type: integer
+          nullable: true
+          example: null
+        code:
+          type: string
+          example: ABC123
+        createdAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        settings:
+          $ref: '#/components/schemas/UserSettings'
+
+    UserSettings:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        userId:
+          type: integer
+          example: 1
+        targetUrl:
+          type: string
+          example: ''
+        domains:
+          type: array
+          items:
+            type: string
+          example: []
+        createdAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2023-01-01T00:00:00Z
+
+    Token:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        refreshToken:
+          type: string
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        exp:
+          type: integer
+          example: 1743598603
+
+    Team:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: 'ID đội nhóm'
+        name:
+          type: string
+          description: 'Tên đội nhóm'
+        creatorId:
+          type: integer
+          description: 'ID người tạo đội nhóm'
+        status:
+          type: string
+          description: 'Trạng thái đội nhóm'
+        targetUrl:
+          type: string
+          description: 'URL mục tiêu của đội nhóm'
+        createdAt:
+          type: string
+          format: date-time
+          description: 'Thời gian tạo đội nhóm'
+        updatedAt:
+          type: string
+          format: date-time
+          description: 'Thời gian cập nhật đội nhóm'
+        members:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                description: 'ID của thành viên'
+              email:
+                type: string
+                description: 'Email của thành viên'
+              username:
+                type: string
+                description: 'Tên người dùng của thành viên'
+              settings:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    description: 'ID cấu hình'
+                  targetUrl:
+                    type: string
+                    description: 'URL mục tiêu'
+                  domains:
+                    type: array
+                    items:
+                      type: string
+                    description: 'Danh sách domain'
+              links:
+                type: array
+                items:
+                  type: object
+                description: 'Các liên kết của thành viên'
+
+    GetTeamListRequest:
+      type: 'object'
+      properties:
+        pagingParams:
+          type: 'object'
+          properties:
+            orderBy:
+              type: 'string'
+              example: 'name:desc'
+            keyword:
+              type: 'string'
+              example: ''
+            pageIndex:
+              type: 'integer'
+              example: 1
+            isPaging:
+              type: 'boolean'
+              example: true
+            pageSize:
+              type: 'integer'
+              example: 10
+        filterParams:
+          type: 'object'
+          properties:
+            creatorId:
+              type: 'integer'
+              example: 1
+            DayCreate:
+              type: 'object'
+              properties:
+                startDay:
+                  type: 'string'
+                  format: 'date'
+                  example: '21-1-2003'
+                endDay:
+                  type: 'string'
+                  format: 'date'
+                  example: '21-2-2003'
+            membersId:
+              type: 'integer'
+              example: 1
+
+    GetTeamListResponse:
+      type: 'object'
+      properties:
+        teams:
+          type: 'array'
+          items:
+            $ref: '#/components/schemas/Team'
+        totalPages:
+          type: 'integer'
+          example: 5
+        message:
+          type: 'string'
+          example: 'Lấy danh sách đội nhóm thành công'
+        status:
+          type: 'integer'
+          example: 200
+
+    CreateLinkResponse:
+      type: 'object'
+      properties:
+        message:
+          type: 'string'
+          example: 'Link created successfully'
+        data:
+          type: 'object'
+          properties:
+            id:
+              type: 'integer'
+              example: 1
+            mask:
+              type: 'string'
+              example: 'sportingnews'
+            hid:
+              type: 'string'
+              example: 'BJLUE9'
+            creatorId:
+              type: 'integer'
+              example: 1
+            teamId:
+              type: ['integer', 'null']
+              example: null
+            shortLink:
+              type: 'string'
+              example: '7SCLTFVSZ0TLHKQVD3'
+            targetUrl:
+              type: 'string'
+              format: 'uri'
+              example: 'https://vnexpress.net/'
+            createdAt:
+              type: 'string'
+              format: 'date-time'
+              example: '2025-04-02T19:05:31.922Z'
+            updatedAt:
+              type: 'string'
+              format: 'date-time'
+              example: '2025-04-02T19:05:31.922Z'
+        status:
+          type: 'integer'
+          example: 200
